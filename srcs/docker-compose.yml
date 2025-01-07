@@ -1,0 +1,24 @@
+version: '3.7'  # Specifies the Docker Compose file format version.
+services:
+  mariadb:
+    container_name: mariadb  # Sets the container name explicitly.
+    build: ./requirements/mariadb  # Builds the image using the Dockerfile in the specified directory.
+    volumes:
+      - mariadb:/var/lib/mysql  # Use the existing mariadb volume defined later
+    networks:
+      - inception  # Connects the service to the custom 'inception' network.
+    restart: always  # Ensures the container restarts automatically on failure or on system reboot.
+    env_file:
+      - .env  # Loads environment variables from a `.env` file.
+
+networks:
+  inception:
+    driver: bridge  # Uses the bridge network driver for communication between containers.
+
+volumes:
+  mariadb:  # The correct volume definition for mariadb
+    name: mariadb
+    driver_opts:
+      type: "none"
+      o: bind
+      device: $VOLUMES_PATH/mariadb
