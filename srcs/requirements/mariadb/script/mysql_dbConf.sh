@@ -1,10 +1,4 @@
 #!/bin/bash
-configure_zsh() {
-    echo "Configuring Zsh..."
-    chsh -s $(which zsh)
-    wget -q https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O ~/install.sh
-    echo "alias ohmyzsh-install='sh ~/install.sh'" >> ~/.zshrc
-}
 
 start_mariadb() {
     echo "Starting MariaDB service..."
@@ -26,7 +20,6 @@ restart_mariadb() {
     mysqld_safe --port=3306 --bind-address=0.0.0.0 --datadir='/var/lib/mysql'
 }
 
-configure_zsh
 start_mariadb
 configure_mariadb
 restart_mariadb

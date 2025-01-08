@@ -1,4 +1,8 @@
+
 LISTCONTAINERS := $(shell docker ps -a -q)
+LISTIMAGES := $(shell docker images -qa)
+LISTVOLUMES := $(shell docker volume ls -q)
+LISTNETWORK := $(shell docker network ls -q)
 
 all: up
 
@@ -25,8 +29,8 @@ clean:
 		docker stop $(LISTCONTAINERS); \
 		docker rm $(LISTCONTAINERS); \
 	fi
-	@docker rmi -f $$(docker images -qa)
-	@docker volume rm $$(docker volume ls -q)
-	@docker network rm $$(docker network ls -q)
+	@docker rmi -f  $(LISTIMAGES)
+	@docker volume rm  $(LISTVOLUMES)
+	@docker network rm  $(LISTNETWORK)
 
 .PHONY: all up down stop start re status clean

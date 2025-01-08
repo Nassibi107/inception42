@@ -10,7 +10,18 @@ services:
     restart: always  # Ensures the container restarts automatically on failure or on system reboot.
     env_file:
       - .env  # Loads environment variables from a `.env` file.
-
+    nginx:
+      container_name: nginx
+      build: ./requirements/nginx
+      ports:
+        - "443:443"
+      depends_on:
+        - wordpress
+      volumes:
+        - wordpress:/var/www/wordpress
+      networks:
+        - inception
+      restart: always
 networks:
   inception:
     driver: bridge  # Uses the bridge network driver for communication between containers.
@@ -22,3 +33,9 @@ volumes:
       type: "none"
       o: bind
       device: $VOLUMES_PATH/mariadb
+  wordpress:
+    name: wordpress
+    driver_opts:
+      type: "none"
+      o: bind
+      device: $VOLUMES_PATH/wordpress
