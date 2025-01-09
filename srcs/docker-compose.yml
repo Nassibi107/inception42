@@ -22,6 +22,20 @@ services:
       networks:
         - inception
       restart: always
+      env_file:
+        - .env
+    wordpress:
+      container_name: wordpress
+      build: ./requirements/wordpress
+      depends_on:
+        - mariadb
+      volumes:
+        - wordpress:/var/www/wordpress
+      env_file:
+        - .env
+      networks:
+        - inception
+      restart: always
 networks:
   inception:
     driver: bridge  # Uses the bridge network driver for communication between containers.
