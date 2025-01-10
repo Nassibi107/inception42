@@ -1,11 +1,18 @@
-[www]
-user = nobody
-group = nobody
-listen = [::]:9000
-chdir = /wp
-pm = dynamic
-pm.max_children = 5
-pm.start_servers = 2
-pm.min_spare_servers = 1
-pm.max_spare_servers = 3
-catch_workers_output = Yes
+ Network srcs_inception  Creating
+ Network srcs_inception  Created
+ Volume "mariadb"  Creating
+ Volume "mariadb"  Created
+ Volume "wordpress"  Creating
+ Volume "wordpress"  Created
+ Container mariadb  Creating
+ Container mariadb  Created
+ Container wordpress  Creating
+ Container wordpress  Created
+ Container nginx  Creating
+ Container nginx  Created
+ Container mariadb  Starting
+ Container mariadb  Started
+ Container wordpress  Starting
+ Container wordpress  Started
+ Container nginx  Starting
+ Container nginx  Started

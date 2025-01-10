@@ -10,32 +10,32 @@ services:
     restart: always  # Ensures the container restarts automatically on failure or on system reboot.
     env_file:
       - .env  # Loads environment variables from a `.env` file.
-    nginx:
-      container_name: nginx
-      build: ./requirements/nginx
-      ports:
-        - "443:443"
-      depends_on:
-        - wordpress
-      volumes:
-        - wordpress:/var/www/wordpress
-      networks:
-        - inception
-      restart: always
-      env_file:
+  nginx:
+    container_name: nginx
+    build: ./requirements/nginx
+    ports:
+      - "443:443"
+    depends_on:
+      - wordpress
+    volumes:
+      - wordpress:/var/www/wordpress
+    networks:
+      - inception
+    restart: always
+    env_file:
         - .env
-    wordpress:
-      container_name: wordpress
-      build: ./requirements/wordpress
-      depends_on:
-        - mariadb
-      volumes:
-        - wordpress:/var/www/wordpress
-      env_file:
-        - .env
-      networks:
-        - inception
-      restart: always
+  wordpress:
+    container_name: wordpress
+    build: ./requirements/wordpress
+    depends_on:
+      - mariadb
+    volumes:
+      - wordpress:/var/www/wordpress
+    env_file:
+      - .env
+    networks:
+      - inception
+    restart: always
 networks:
   inception:
     driver: bridge  # Uses the bridge network driver for communication between containers.
