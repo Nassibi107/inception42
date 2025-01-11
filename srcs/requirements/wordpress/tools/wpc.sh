@@ -5,6 +5,14 @@ command_exists() {
   command -v "$1" >/dev/null 2>&1
 }
 
+# Check required environment variables
+check_env_vars() {
+  if [ -z "$MYSQL_USER" ] || [ -z "$MYSQL_PASSWORD" ] || [ -z "$MYSQL_HOSTNAME" ] || [ -z "$MYSQL_DATABASE" ] || [ -z "$DNS_LOCAL" ]; then
+    echo "Error: Required environment variables are missing."
+    exit 1
+  fi
+}
+
 # Function to download and extract WordPress
 download_wordpress() {
   echo "Downloading and extracting WordPress..."
@@ -39,19 +47,38 @@ configure_wp_config() {
 }
 
 # Function to configure Redis settings in WordPress
-configure_redis() {
-  echo "Configuring Redis settings..."
+# configure_redis() {
+#   echo "Configuring Redis settings..."
 
-  wp config set WP_REDIS_HOST redis --allow-root
-  wp config set WP_REDIS_PORT 6379 --raw --allow-root
-  wp config set WP_CACHE_KEY_SALT $DNS_LOCAL --allow-root
-  wp config set WP_REDIS_CLIENT phpredis --allow-root
-  wp plugin install redis-cache --activate --allow-root
-  wp plugin update --all --allow-root
-  wp redis enable --allow-root
+#   wp config set WP_REDIS_HOST redis --allow-root
+#   wp config set WP_REDIS_PORT 6379 --raw --allow-root
+#   wp config set WP_CACHE_KEY_SALT $DNS_LOCAL --allow-root
+#   wp config set WP_REDIS_CLIENT phpredis --allow-root
+
+#   # Install and activate Redis cache plugin
+#   wp plugin install redis-cache --activate --allow-root
+#   wp plugin update --all --allow-root
+#   wp redis enable --allow-root
+# }
+
+# Function to install WordPress core (create database tables)
+install_wordpress() {
+  echo "Installing WordPress core..."
+  
+  # Run wp core install to initialize WordPress
+  wp core install --url="$DNS_LOCAL" --title="insptions" \
+    --admin_user="admin" --admin_password="admin_password" \
+    --admin_email="admin@example.com" --allow-root
+  if [ $? -ne 0 ]; then
+    echo "Error: Failed to install WordPress."
+    exit 1
+  fi
 }
 
 # Main script execution
+
+# Check if environment variables are set
+check_env_vars
 
 # Check if wp-config.php already exists
 if [ -f ./wp-config.php ]; then
@@ -62,8 +89,12 @@ else
   configure_wp_config
 
   # Optional bonus part: Redis configuration
-  configure_redis
+  # configure_redis
 fi
+
+# Install WordPress core (run this after wp-config.php is set up)
+install_wordpress
+
 
 # Execute the command passed to the script
 exec "$@"
