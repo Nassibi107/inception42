@@ -1,100 +1,52 @@
-#!/bin/sh
-
-# Function to check if a command exists and run it
-command_exists() {
-  command -v "$1" >/dev/null 2>&1
+#!/bin/env bash
+ping_mariadb_container() {
+    nc -zv mariadb 3306 > /dev/null
+    return $?
 }
+start_time=$(date +%s)
+end_time=$((start_time + 20))
+while [ $(date +%s) -lt $end_time ]; do
+    ping_mariadb_container
+    if [ $? -eq 0 ]; then
+        echo "[========MARIADB IS UP AND RUNNING========]"
+        break
+    else
+        echo "[========WAITING FOR MARIADB TO START...========]"
+        sleep 1
+    fi
+done
 
-# Check required environment variables
-check_env_vars() {
-  if [ -z "$MYSQL_USER" ] || [ -z "$MYSQL_PASSWORD" ] || [ -z "$MYSQL_HOSTNAME" ] || [ -z "$MYSQL_DATABASE" ] || [ -z "$DNS_LOCAL" ]; then
-    echo "Error: Required environment variables are missing."
-    exit 1
-  fi
-}
-
-# Function to download and extract WordPress
-download_wordpress() {
-  echo "Downloading and extracting WordPress..."
-  wget -q http://wordpress.org/latest.tar.gz
-  if [ $? -ne 0 ]; then
-    echo "Error: Failed to download WordPress."
-    exit 1
-  fi
-
-  tar -xzf latest.tar.gz
-  if [ $? -ne 0 ]; then
-    echo "Error: Failed to extract WordPress."
-    exit 1
-  fi
-
-  mv wordpress/* .
-  rm -rf latest.tar.gz wordpress
-}
-
-# Function to configure wp-config.php with environment variables
-configure_wp_config() {
-  echo "Configuring wp-config.php..."
-
-  # Replace placeholders in wp-config-sample.php with environment variables
-  sed -i "s/username_here/$MYSQL_USER/g" wp-config-sample.php
-  sed -i "s/password_here/$MYSQL_PASSWORD/g" wp-config-sample.php
-  sed -i "s/localhost/$MYSQL_HOSTNAME/g" wp-config-sample.php
-  sed -i "s/database_name_here/$MYSQL_DATABASE/g" wp-config-sample.php
-
-  # Rename the sample to wp-config.php
-  cp wp-config-sample.php wp-config.php
-}
-
-# Function to configure Redis settings in WordPress
-# configure_redis() {
-#   echo "Configuring Redis settings..."
-
-#   wp config set WP_REDIS_HOST redis --allow-root
-#   wp config set WP_REDIS_PORT 6379 --raw --allow-root
-#   wp config set WP_CACHE_KEY_SALT $DNS_LOCAL --allow-root
-#   wp config set WP_REDIS_CLIENT phpredis --allow-root
-
-#   # Install and activate Redis cache plugin
-#   wp plugin install redis-cache --activate --allow-root
-#   wp plugin update --all --allow-root
-#   wp redis enable --allow-root
-# }
-
-# Function to install WordPress core (create database tables)
-install_wordpress() {
-  echo "Installing WordPress core..."
-  
-  # Run wp core install to initialize WordPress
-  wp core install --url="$DNS_LOCAL" --title="insptions" \
-    --admin_user="admin" --admin_password="admin_password" \
-    --admin_email="admin@example.com" --allow-root
-  if [ $? -ne 0 ]; then
-    echo "Error: Failed to install WordPress."
-    exit 1
-  fi
-}
-
-# Main script execution
-
-# Check if environment variables are set
-check_env_vars
-
-# Check if wp-config.php already exists
-if [ -f ./wp-config.php ]; then
-  echo "WordPress is already downloaded and configured."
-else
-  # Mandatory part: Download WordPress and configure wp-config.php
-  download_wordpress
-  configure_wp_config
-
-  # Optional bonus part: Redis configuration
-  # configure_redis
+if [ $(date +%s) -ge $end_time ]; then
+    echo "[========MARIADB IS NOT RESPONDING========]"
 fi
 
-# Install WordPress core (run this after wp-config.php is set up)
-install_wordpress
+#---------------------------------------------------wp installation---------------------------------------------------#
 
+curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+chmod +x wp-cli.phar
+mv wp-cli.phar /usr/local/bin/wp
 
-# Execute the command passed to the script
-exec "$@"
+cd /var/www/wordpress
+chmod -R 755 /var/www/wordpress/
+chown -R www-data:www-data /var/www/wordpress
+
+check_core_files() {
+    wp core is-installed --allow-root > /dev/null
+    return $?
+}
+if ! check_core_files; then
+    echo "[========WP INSTALLATION STARTED========]"
+    find /var/www/wordpress/ -mindepth 1 -delete
+    wp core download --allow-root
+    wp core config --dbhost=mariadb:3306 --dbname="$MYSQL_DB" --dbuser="$MYSQL_USER" --dbpass="$MYSQL_PASSWORD" --allow-root
+    wp core install --url="$DOMAIN_NAME" --title="$WP_TITLE" --admin_user="$WP_ADMIN_N" --admin_password="$WP_ADMIN_P" --admin_email="$WP_ADMIN_E" --allow-root
+    wp user create "$WP_U_NAME" "$WP_U_EMAIL" --user_pass="$WP_U_PASS" --role="$WP_U_ROLE" --allow-root
+else
+    echo "[========WordPress files already exist. Skipping installation========]"
+fi
+
+#---------------------------------------------------php config---------------------------------------------------#
+
+sed -i '36 s@/run/php/php7.4-fpm.sock@9000@' /etc/php/7.4/fpm/pool.d/www.conf
+mkdir -p /run/php
+/usr/sbin/php-fpm7.4 -F
