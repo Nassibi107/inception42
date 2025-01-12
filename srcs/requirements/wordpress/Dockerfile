@@ -4,8 +4,8 @@ RUN apt-get update && apt-get upgrade -y
 
 RUN apt-get install -y curl php php7.4-fpm php-mysql mariadb-client wget vim zsh git netcat mycli
 
-COPY /conf/wpc.sh /
+COPY /tools/wpc.sh /
 
 RUN  chmod +x wpc.sh
 
-ENTRYPOINT ["./wpc.sh"]
+ENTRYPOINT ["bash","./wpc.sh"]
