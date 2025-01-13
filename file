@@ -1,9 +1,9 @@
  Network srcs_inception  Creating
  Network srcs_inception  Created
- Volume "wordpress"  Creating
- Volume "wordpress"  Created
  Volume "mariadb"  Creating
  Volume "mariadb"  Created
+ Volume "wordpress"  Creating
+ Volume "wordpress"  Created
  Container mariadb  Creating
  Container mariadb  Created
  Container wordpress  Creating

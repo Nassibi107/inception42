@@ -17,4 +17,5 @@ RUN mkdir -p /var/www/wordpress
 RUN chown -R www-data:www-data /var/www/wordpress
 
 RUN rm /etc/nginx/sites-enabled/default
+
 CMD ["nginx", "-g", "daemon off;"]

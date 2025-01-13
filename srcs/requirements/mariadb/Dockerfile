@@ -13,8 +13,8 @@ RUN apt-get update && apt-get upgrade -y && \
 
 COPY script/mysql_dbConf.sh /mysql_dbConf.sh
 
-# Ensure the configuration script is executable
 RUN chmod +x /mysql_dbConf.sh
 
-# Set the script as the container's entrypoint
+EXPOSE 3306
+
 ENTRYPOINT ["/mysql_dbConf.sh"]

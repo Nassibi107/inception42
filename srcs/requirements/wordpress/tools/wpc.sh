@@ -39,8 +39,8 @@ if ! check_core_files; then
     find /var/www/wordpress/ -mindepth 1 -delete
     wp core download --allow-root
     wp core config --dbhost=mariadb:3306 --dbname="$MYSQL_DB" --dbuser="$MYSQL_USER" --dbpass="$MYSQL_PASSWORD" --allow-root
-    wp core install --url="$DOMAIN_NAME" --title="$WP_TITLE" --admin_user="$WP_ADMIN_N" --admin_password="$WP_ADMIN_P" --admin_email="$WP_ADMIN_E" --allow-root
-    wp user create "$WP_U_NAME" "$WP_U_EMAIL" --user_pass="$WP_U_PASS" --role="$WP_U_ROLE" --allow-root
+    wp core install --url="$DNS_LOCAL" --title="$WP_TITLE" --admin_user="$WP_USER_ADMIN" --admin_password="$WP_PASS_ADMIN" --admin_email="$WP_EMAIL_ADMIN" --allow-root
+    wp user create "$WP_USER_UINIT" "$WP_EMAIN_UINIT" --user_pass="$WP_PASS_UINIT" --role="$WP_ROLE_UINIT" --allow-root
 else
     echo "[========WordPress files already exist. Skipping installation========]"
 fi
