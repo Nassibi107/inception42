@@ -8,13 +8,13 @@ RESET='\033[0m'
 
 
 bong() {
-    nc -zv mariadb 3306 > /wp_log/wp_log.txt 2> /wp_log/error_wp_log.txt
+    nc -zv mariadb 3306  &> /dev/null
     return $?
 }
 
-start_time=$(date +%s)
-end_time=$((start_time + 25))
-while [ $(date +%s) -lt $end_time ]; do
+tts=$(date +%s)
+tte=$((tts + 25))
+while [ $(date +%s) -lt $tte ]; do
     if bong; then
         echo -e "${GREEN}[========🎉 MARIADB IS READY! 🎉========]${RESET}"
         break
@@ -42,7 +42,7 @@ chown -R www-data:www-data /var/www/wordpress
 
 
 check_core_files() {
-    wp core is-installed --allow-root >  /wp_log/cpi_log.txt 2>  /wp_log/error_cpi_log.txt
+    wp core is-installed --allow-root &> /dev/null
     return $?
 }
 
