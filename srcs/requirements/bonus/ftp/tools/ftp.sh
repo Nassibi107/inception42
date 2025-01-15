@@ -1,8 +1,14 @@
 #!/bin/sh
 
+# Ensure the /etc/vsftpd directory and user list exist
+mkdir -p /etc/vsftpd
+touch /etc/vsftpd.userlist
+
+# Create the secure chroot directory
+mkdir -p /var/run/vsftpd/empty
+
 # Check if the backup configuration file exists
 if [ ! -f "/etc/vsftpd/vsftpd.conf.bak" ]; then
-
     echo "Initializing FTP server configuration..."
 
     # Ensure the target directory exists

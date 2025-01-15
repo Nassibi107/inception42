@@ -6,8 +6,8 @@ RUN apt-get update && \
 
 COPY ./tools/redisConfig.sh /tmp/redisConfig.sh
 
-RUN chmod +x /tmp/redis.sh
+RUN chmod +x /tmp/redisConfig.sh
 
 EXPOSE 6379
 
-ENTRYPOINT ["sh", "/tmp/redis.sh"]
+ENTRYPOINT ["sh", "/tmp/redisConfig.sh"]

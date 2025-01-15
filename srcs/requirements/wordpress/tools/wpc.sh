@@ -34,6 +34,10 @@ fi
 if [ ! -f /usr/local/bin/wp ]; then
     echo -e "${YELLOW}Downloading WP-CLI...${RESET}"
     curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}❌ Failed to download WP-CLI ❌${RESET}"
+        exit 1
+    fi
     chmod +x wp-cli.phar
     mv wp-cli.phar /usr/local/bin/wp
 fi
@@ -72,13 +76,18 @@ else
 fi
 
 if [ $pass -eq 0 ]; then
+    if nc -zv redis 6379 &> /dev/null; then
+        wp redis enable --allow-root
+    else
+        echo -e "${RED}❌ Redis is not running ❌${RESET}"
+        exit 1
+    fi
     wp config set WP_REDIS_HOST redis --allow-root
     wp config set WP_REDIS_PORT 6379 --raw --allow-root
     wp config set WP_CACHE_KEY_SALT "$DNS_LOCAL" --allow-root
     wp config set WP_REDIS_CLIENT phpredis --allow-root
     wp plugin install redis-cache --activate --allow-root
     wp plugin update --all --allow-root
-    wp redis enable --allow-root
 fi
 
 sed -i '36 s@/run/php/php7.4-fpm.sock@9000@' /etc/php/7.4/fpm/pool.d/www.conf
