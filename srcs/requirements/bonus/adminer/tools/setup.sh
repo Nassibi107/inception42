@@ -23,7 +23,9 @@ PACKAGES=" \
     php8-ldap \
     php8-ctype \
     php8-dom \
-    php8-simplexml"
+    php8-simplexml \
+     less \
+    mariadb-client "
 
 apk update && apk add --no-cache $PACKAGES
 
