@@ -50,7 +50,13 @@ services:
       -  wordpress:/var/www/wordpress
     networks:
       - inception
-
+  adminer:
+    build: ./requirements/bonus/adminer
+    restart: always
+    depends_on:
+      - mariadb
+    networks:
+      - inception
   ftp:
     build: requirements/bonus/ftp
     container_name: ftp
