@@ -2,8 +2,9 @@ FROM debian:buster
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Install required packages: nodejs, npm, wget, unzip, git
 RUN apt update -y && \
-    apt install -y nodejs npm && \
+    apt install -y nodejs npm wget unzip git && \
     apt clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -11,11 +12,11 @@ COPY ./conf /home/app
 
 WORKDIR /home/app
 
-COPY ./tools/web.sh web.sh
+COPY ./tools/web.sh /home/app/web.sh
 
 RUN chmod +x web.sh
 
-RUN ./web.sh && \
+RUN bash web.sh && \
     rm web.sh
 
 RUN npm init -y && \

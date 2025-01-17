@@ -1,21 +1,8 @@
-FROM debian:bullseye-slim
+FROM debian:bullseye
 
-# Install vsftpd and create necessary directories
-RUN apt-get update && apt-get install -y \
-    vsftpd \
-    && mkdir -p /etc/vsftpd \
-    && touch /etc/vsftpd.userlist \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt update -y && apt upgrade -y && apt-get install -y vsftpd
 
-# Create the vsftpd.conf file with the basic configuration
-COPY /conf/vsftpd.conf  /etc/vsftpd/vsftpd.conf
+COPY ./conf/vsftpd.conf /etc/vsftpd.conf
+COPY ./tools/ftp.sh /
 
-# Copy your ftp.sh and any other necessary files
-COPY tools/ftp.sh /usr/local/bin/ftp.sh
-COPY conf/vsftpd.conf /tmp/vsftpd.conf
-
-RUN chmod +x /usr/local/bin/ftp.sh
-
-EXPOSE 21
-
-ENTRYPOINT ["sh", "/usr/local/bin/ftp.sh"]
+ENTRYPOINT ["sh", "/ftp.sh"]
