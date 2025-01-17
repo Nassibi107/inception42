@@ -8,7 +8,7 @@ if [ ! -f "$REDIS_CONF_BAK" ]; then
     
     sed -i "s|^bind 127.0.0.1|#bind 127.0.0.1|g" "$REDIS_CONF"
     sed -i "s|^# maxmemory <bytes>|maxmemory 2mb|g" "$REDIS_CONF"
-    sed -i "s|^# maxmemory-policy noeviction|maxmemory-policy allkeys-lru|g" "$REDIS_CONF"
+    echo "maxmemory-policy allkeys-lru" >> "$REDIS_CONF"
 fi
 
 exec redis-server --protected-mode no

@@ -74,6 +74,25 @@ services:
       FTP_PWD: ${PFTP}
     env_file:
       - .env
+  cadvisor:
+    container_name: cadvisor
+    build: ./requirements/bonus/cadvisor
+    ports:
+      - "8080:8080"
+    networks:
+      - inception
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro 
+      - /sys:/sys:ro 
+      - /var/lib/docker/:/var/lib/docker:ro
+    restart: always
+  webstatic:
+    container_name: webstatic
+    build: ./requirements/bonus/webstatics
+    image: webstatic:42
+    ports:
+      - "3000:3000"
 networks:
   inception:
     driver: bridge  # Uses the bridge network driver for communication between containers.
