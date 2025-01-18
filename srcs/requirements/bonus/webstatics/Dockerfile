@@ -2,7 +2,6 @@ FROM debian:buster
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install required packages: nodejs, npm, wget, unzip, git
 RUN apt update -y && \
     apt install -y nodejs npm wget unzip git && \
     apt clean && \

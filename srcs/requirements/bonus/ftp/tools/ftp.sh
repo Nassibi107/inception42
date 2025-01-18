@@ -1,12 +1,30 @@
-#!/bin/sh
+#!/bin/bash
 
-useradd -m $UFTP
-echo "$UFTP:$PFTP" | chpasswd
-mkdir -p /home/$UFTP/ftp/upload
-mkdir -p /var/run/vsftpd/empty
-chown nobody:nogroup /home/$UFTP/ftp/upload
+
+service vsftpd start
+
+# Add the USER, change his password and declare him as the owner of wordpress folder and all subfolders
+
+adduser $UFTP --disabled-password
+
+echo "$UFTP:$PFTP" | /usr/sbin/chpasswd
+
+echo "$UFTP" | tee -a /etc/vsftpd.userlist 
+
+
+mkdir /home/$UFTP/ftp
+
+
+chown nobody:nogroup /home/$UFTP/ftp
 chmod a-w /home/$UFTP/ftp
-chmod 755 /home/$UFTP/ftp/upload
-chmod 755 /var/run/vsftpd/empty 
 
-vsftpd /etc/vsftpd.conf
+mkdir /home/$UFTP/ftp/files
+chown $UFTP:$UFTP /home/$UFTP/ftp/files
+
+sed -i -r "s/#write_enable=YES/write_enable=YES/1"   /etc/vsftpd.conf
+sed -i -r "s/#chroot_local_user=YES/chroot_local_user=YES/1"   /etc/vsftpd.conf
+
+service vsftpd stop
+
+
+/usr/sbin/vsftpd
