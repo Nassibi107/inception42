@@ -85,7 +85,7 @@ if [ $pass -eq 0 ]; then
     wp config set WP_REDIS_HOST redis --allow-root
     wp config set WP_REDIS_PORT 6379 --raw --allow-root
     wp config set WP_CACHE_KEY_SALT "$DNS_LOCAL" --allow-root
-    wp config set WP_REDIS_CLIENT phpredis --allow-root
+    # wp config set WP_REDIS_CLIENT phpredis --allow-root
     wp plugin install redis-cache --activate --allow-root
     wp plugin update --all --allow-root
 fi

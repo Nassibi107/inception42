@@ -9,7 +9,13 @@ services:
       - inception  # Connects the service to the custom 'inception' network.
     restart: always  # Ensures the container restarts automatically on failure or on system reboot.
     env_file:
-      - .env  # Loads environment variables from a `.env` file.
+      - .env 
+    healthcheck:
+      test: ["CMD", "nc", "-zv", "localhost", "3306"]
+      interval: 30s
+      retries: 3
+      start_period: 5s
+      timeout: 10s # Loads environment variables from a `.env` file.
   nginx:
     container_name: nginx
     build: ./requirements/nginx
