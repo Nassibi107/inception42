@@ -1,8 +1,8 @@
-FROM debian:bullseye
+FROM debian:buster
 
 RUN apt-get update && apt-get upgrade -y
 
-RUN apt-get install -y nginx openssl vim zsh wget git
+RUN apt-get install -y nginx openssl  wget vim 
 
 RUN mkdir -p /etc/nginx/ssl
 
@@ -14,6 +14,7 @@ COPY conf/nginx.conf /etc/nginx/nginx.conf
 COPY tools/collect_nginx_logs.sh /usr/local/bin/collect_nginx_logs.sh
 
 RUN chmod +x /usr/local/bin/collect_nginx_logs.sh
+
 RUN mkdir -p /var/www/wordpress
 
 RUN chown -R www-data:www-data /var/www/wordpress

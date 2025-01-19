@@ -9,7 +9,6 @@ cp /var/log/nginx/error.log $LOG_DIR/error.log
 
 tar -czf $LOG_DIR/nginx_logs_$(date +%F).tar.gz -C $LOG_DIR access.log error.log
 
-
 > /var/log/nginx/access.log
 > /var/log/nginx/error.log
 

@@ -1,13 +1,13 @@
-version: '3.7'  # Specifies the Docker Compose file format version.
+version: '3.7' 
 services:
   mariadb:
-    container_name: mariadb  # Sets the container name explicitly.
-    build: ./requirements/mariadb  # Builds the image using the Dockerfile in the specified directory.
+    container_name: mariadb  
+    build: ./requirements/mariadb 
     volumes:
-      - mariadb:/var/lib/mysql  # Use the existing mariadb volume defined later
+      - mariadb:/var/lib/mysql 
     networks:
-      - inception  # Connects the service to the custom 'inception' network.
-    restart: always  # Ensures the container restarts automatically on failure or on system reboot.
+      - inception  
+    restart: always
     env_file:
       - .env 
     healthcheck:
@@ -15,7 +15,7 @@ services:
       interval: 30s
       retries: 3
       start_period: 5s
-      timeout: 10s # Loads environment variables from a `.env` file.
+      timeout: 10s
   nginx:
     container_name: nginx
     build: ./requirements/nginx
@@ -80,7 +80,7 @@ services:
       - .env
   cadvisor:
     container_name: cadvisor
-    build: ./requirements/bonus/cadvisor  # Path to your Dockerfile
+    build: ./requirements/bonus/cadvisor 
     ports:
       - "8080:8080"
     networks:
@@ -99,10 +99,10 @@ services:
       - "3000:3000"
 networks:
   inception:
-    driver: bridge  # Uses the bridge network driver for communication between containers.
+    driver: bridge
 
 volumes:
-  mariadb:  # The correct volume definition for mariadb
+  mariadb: 
     name: mariadb
     driver_opts:
       type: "none"
