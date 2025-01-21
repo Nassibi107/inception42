@@ -15,6 +15,7 @@ pass=1
 tts=$(date +%s)
 tte=$((tts + 25))
 
+# Wait for MariaDB to start
 while [ $(date +%s) -lt $tte ]; do
     if bong; then
         echo -e "${GREEN}[========🎉 MARIADB IS READY! 🎉========]${RESET}"
@@ -26,11 +27,13 @@ while [ $(date +%s) -lt $tte ]; do
     fi
 done
 
+# Exit if MariaDB is not responsive
 if [ $pass -ne 0 ]; then
     echo -e "${RED} ❌ MARIADB IS NOT RESPONDING AFTER ~25 SECONDS~ ❌${RESET}"
     exit 1
 fi
 
+# Install WP-CLI if it doesn't exist
 if [ ! -f /usr/local/bin/wp ]; then
     echo -e "${YELLOW}Downloading WP-CLI...${RESET}"
     curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
@@ -42,6 +45,7 @@ if [ ! -f /usr/local/bin/wp ]; then
     mv wp-cli.phar /usr/local/bin/wp
 fi
 
+# Setup WordPress
 cd /var/www/wordpress || exit 1
 chmod -R 755 /var/www/wordpress/
 chown -R www-data:www-data /var/www/wordpress
@@ -51,6 +55,7 @@ wpChecker() {
     return $?
 }
 
+# If WordPress isn't installed, install and configure it
 if wpChecker; then
     echo -e "${GREEN} ✅ WordPress core already present ${RESET}"
 else
@@ -75,20 +80,28 @@ else
     echo -e "${GREEN}. ...⚙️........⚙️ ....⚙️.....⚙️..... ${RESET}"
 fi
 
+# Check if Redis is running, and set up caching
 if [ $pass -eq 0 ]; then
     if nc -zv redis 6379 &> /dev/null; then
+        echo -e "${GREEN} ✅ Redis is running! ${RESET}"
+
+        # Enable Redis caching (no need for --host, --port, or --password)
         wp redis enable --allow-root
     else
         echo -e "${RED}❌ Redis is not running ❌${RESET}"
         exit 1
     fi
+
+    # Update wp-config.php to configure Redis (no password needed)
     wp config set WP_REDIS_HOST redis --allow-root
-  	wp config set WP_REDIS_PORT 6379 --raw --allow-root
- 	wp config set WP_CACHE_KEY_SALT $DNS_LOCAL --allow-root
-    wp config set WP_CACHE "true" --raw --allow-root
-  	wp config set WP_REDIS_PASSWORD $CACHE_REDIS_PASS --allow-root
-	wp plugin install redis-cache --activate --allow-root
-	wp redis enable --allow-root
+    wp config set WP_REDIS_PORT 6379 --raw --allow-root
+    wp plugin install redis-cache --activate --allow-root
+    wp plugin update --all --allow-root
+    wp config set WP_CACHE_KEY_SALT "$DNS_LOCAL" --allow-root
+    wp cache flush --allow-root
 fi
 
-echo -e "${GREEN}✅ WordPress is ready!${RESET}"
+# Update PHP-FPM config to listen on TCP/IP
+sed -i '36 s@/run/php/php7.4-fpm.sock@9000@' /etc/php/7.4/fpm/pool.d/www.conf
+mkdir -p /run/php
+/usr/sbin/php-fpm7.4 -F
