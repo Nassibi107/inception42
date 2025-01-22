@@ -1,7 +1,8 @@
 version: '3.7'  
 services:
   mariadb:
-    container_name: mariadb  
+    container_name: mariadb 
+    image: mariadb:13
     build: ./requirements/mariadb  
     volumes:
       - mariadb:/var/lib/mysql  
@@ -13,6 +14,7 @@ services:
 
   nginx:
     container_name: nginx
+    image: nginx:13
     build: ./requirements/nginx
     ports:
       - "443:443"
@@ -27,6 +29,7 @@ services:
         - .env
   wordpress:
     container_name: wordpress
+    image: wordpress:13
     build: ./requirements/wordpress
     depends_on:
       - mariadb
@@ -39,6 +42,7 @@ services:
     restart: always
   redis:
     container_name: redis
+    image: redis:13
     build: ./requirements/bonus/redis
     depends_on:
       - wordpress
@@ -53,6 +57,7 @@ services:
       - inception
   adminer:
     container_name: adminer
+    image: adminer:13
     build: ./requirements/bonus/adminer
     restart: always
     depends_on:
@@ -61,6 +66,7 @@ services:
       - inception
   ftp:
     build: requirements/bonus/ftp
+    image: ftp:13
     container_name: ftp
     ports:
       - "21:21"
@@ -75,6 +81,7 @@ services:
       - .env
   cadvisor:
     container_name: cadvisor
+    image: cadvisor:13
     build: ./requirements/bonus/cadvisor  
     ports:
       - "8080:8080"
@@ -87,8 +94,8 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
   webstatic:
     container_name: webstatic
+    image: webstatic:13
     build: ./requirements/bonus/webstatics
-    image: webstatic:42
     networks:
       - inception
     ports:
