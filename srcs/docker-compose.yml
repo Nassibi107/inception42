@@ -1,0 +1,115 @@
+version: '3.7'  
+services:
+  mariadb:
+    container_name: mariadb  
+    build: ./requirements/mariadb  
+    volumes:
+      - mariadb:/var/lib/mysql  
+    networks:
+      - inception  
+    restart: always  
+    env_file:
+      - .env 
+
+  nginx:
+    container_name: nginx
+    build: ./requirements/nginx
+    ports:
+      - "443:443"
+    depends_on:
+      - wordpress
+    volumes:
+      - wordpress:/var/www/wordpress
+    networks:
+      - inception
+    restart: always
+    env_file:
+        - .env
+  wordpress:
+    container_name: wordpress
+    build: ./requirements/wordpress
+    depends_on:
+      - mariadb
+    volumes:
+      - wordpress:/var/www/wordpress
+    env_file:
+      - .env
+    networks:
+      - inception
+    restart: always
+  redis:
+    container_name: redis
+    build: ./requirements/bonus/redis
+    depends_on:
+      - wordpress
+    ports:
+     - '6379:6379'
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      -  wordpress:/var/www/wordpress
+    networks:
+      - inception
+  adminer:
+    container_name: adminer
+    build: ./requirements/bonus/adminer
+    restart: always
+    depends_on:
+      - mariadb
+    networks:
+      - inception
+  ftp:
+    build: requirements/bonus/ftp
+    container_name: ftp
+    ports:
+      - "21:21"
+      - "20:20"
+      - "40000-40005:40000-40005"
+    volumes:
+      - wordpress:/home/$UFTP/ftp/files
+    networks:
+      - inception
+    restart: always
+    env_file:
+      - .env
+  cadvisor:
+    container_name: cadvisor
+    build: ./requirements/bonus/cadvisor  
+    ports:
+      - "8080:8080"
+    networks:
+      - inception
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    restart: always
+  webstatic:
+    container_name: webstatic
+    build: ./requirements/bonus/webstatics
+    image: webstatic:42
+    networks:
+      - inception
+    ports:
+      - "3000:3000"
+
+# MY CONFIG 
+networks:
+  inception:
+    driver: bridge  
+
+volumes:
+  mariadb:  
+    name: mariadb
+    driver_opts:
+      type: "none"
+      o: bind
+      device: $VOLUMES_PATH/mariadb
+  wordpress:
+    name: wordpress
+    driver_opts:
+      type: "none"
+      o: bind
+      device: $VOLUMES_PATH/wordpress
