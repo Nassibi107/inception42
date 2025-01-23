@@ -1,4 +1,7 @@
-# inception42
+<h1 align="center" id="title">inception42</h1>
+
+<p id="description">Inception is a comprehensive containerized web application project designed to demonstrate the power of Docker and Docker Compose in creating and managing isolated environments for web services. The project sets up a full-fledged web stack comprising MariaDB Nginx and WordPress orchestrated seamlessly using Docker Compose. This setup allows for scalable efficient and portable development and deployment processes making it ideal for developers DevOps engineers and anyone interested in modern web application management.</p>
+
 # mariadb congif 
 
 mariaDB_reloading () : 
