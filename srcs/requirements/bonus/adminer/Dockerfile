@@ -1,16 +1,17 @@
-FROM alpine:3.15.0
+
+FROM debian:bullseye
 
 
-COPY tools/setup.sh /usr/local/bin/setup.sh
+RUN apt -y update 
 
-RUN chmod +x /usr/local/bin/setup.sh
+COPY ./tools/setup.sh /
 
-RUN /usr/local/bin/setup.sh
-
-COPY /conf/www.conf /etc/php8/php-fpm.d/www.conf
+RUN chmod +x setup.sh
+RUN
+RUN apt install wget -y && apt install php php-mysql  -y
 
 EXPOSE 9000
 STOPSIGNAL SIGQUIT
 
 
-CMD ["php-fpm8", "--nodaemonize"]
+CMD ["setup.sh"]

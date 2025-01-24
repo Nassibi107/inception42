@@ -1,37 +1,12 @@
-#!/bin/sh
 
-PACKAGES=" \
-    curl \
-    less \
-    mariadb-client \
-    php8 \
-    php8-fpm \
-    php8-common \
-    php8-session \
-    php8-iconv \
-    php8-json \
-    php8-gd \
-    php8-curl \
-    php8-xml \
-    php8-mysqli \
-    php8-imap \
-    php8-pdo \
-    php8-pdo_mysql \
-    php8-soap \
-    php8-posix \
-    php8-gettext \
-    php8-ldap \
-    php8-ctype \
-    php8-dom \
-    php8-simplexml \
-     less \
-    mariadb-client "
+wget "http://www.adminer.org/latest.php" -O /var/www/html/adminer.php 
+chown -R www-data:www-data /var/www/html/adminer.php 
+chmod 755 /var/www/html/adminer.php
 
-apk update && apk add --no-cache $PACKAGES
-
-
-curl -L -O https://github.com/vrana/adminer/releases/download/v4.8.1/adminer-4.8.1.php
-mkdir -p /var/www/html
 mv ./adminer-4.8.1.php /var/www/html/index.php
 
+cd /var/www/html
 adduser -u 82 -D -S -G www-data www-data
+rm -rf index.html
+
+php-fpm8 --nodaemonize
