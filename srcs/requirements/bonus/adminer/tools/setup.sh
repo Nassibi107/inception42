@@ -1,37 +1,27 @@
 #!/bin/sh
 
-PACKAGES=" \
-    curl \
-    less \
-    mariadb-client \
-    php8 \
-    php8-fpm \
-    php8-common \
-    php8-session \
-    php8-iconv \
-    php8-json \
-    php8-gd \
-    php8-curl \
-    php8-xml \
-    php8-mysqli \
-    php8-imap \
-    php8-pdo \
-    php8-pdo_mysql \
-    php8-soap \
-    php8-posix \
-    php8-gettext \
-    php8-ldap \
-    php8-ctype \
-    php8-dom \
-    php8-simplexml \
-     less \
-    mariadb-client "
+echo "Installing PHP, PHP-MySQL, and wget..."
+apt update &&  apt install php php-mysql wget -y
 
-apk update && apk add --no-cache $PACKAGES
+echo "Downloading Adminer..."
+if wget "$ADMINER_URL" -O "$ADMINER_FILE"; then
+    echo "Adminer downloaded successfully."
+else
+    echo "Failed to download Adminer. Exiting."
+    exit 1
+fi
 
+echo "Setting ownership and permissions..."
+ chown -R www-data:www-data "$ADMINER_FILE"
+ chmod 755 "$ADMINER_FILE"
+echo "Removing default index.html if exists..."
+if [ -f "$WWW_DIR/index.html" ]; then
+     rm -f "$WWW_DIR/index.html"
+    echo "index.html removed."
+else
+    echo "No index.html file to remove."
+fi
 
-curl -L -O https://github.com/vrana/adminer/releases/download/v4.8.1/adminer-4.8.1.php
-mkdir -p /var/www/html
-mv ./adminer-4.8.1.php /var/www/html/index.php
-
-adduser -u 82 -D -S -G www-data www-data
+echo "Starting PHP built-in server on port $PORT..."
+cd "$WWW_DIR" || { echo "Failed to access $WWW_DIR"; exit 1; }
+php -S 0.0.0.0:"$PORT" "$ADMINER_FILE"
