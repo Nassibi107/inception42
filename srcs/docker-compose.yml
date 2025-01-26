@@ -62,6 +62,8 @@ services:
     restart: always
     depends_on:
       - mariadb
+    ports:
+    - "600:600"
     networks:
       - inception
   ftp:
