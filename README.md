@@ -92,11 +92,11 @@ openssl req -x509 -nodes -out /etc/nginx/ssl/ynassibi.crt -keyout /etc/nginx/ssl
 - **Dynamic Process Management:** Automatically scales PHP worker processes based on traffic demand.
 - **Configuration:**
   ```ini
-  pm = dynamic
-  pm.max_children = 50
-  pm.start_servers = 5
-  pm.min_spare_servers = 5
-  pm.max_spare_servers = 35
+pm = dynamic
+pm.max_children = 50          # Maximum number of PHP processes.
+pm.start_servers = 5          # Number of PHP processes to start initially.
+pm.min_spare_servers = 5      # Minimum number of idle PHP processes to keep.
+pm.max_spare_servers = 35     # Maximum number of idle PHP processes allowed.
   ```
 
 #### Idle Processes:
